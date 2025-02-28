@@ -83,6 +83,7 @@ int parse_quoted_arg(char **cur, cmd_buff_t *cmd) {
 
   char *arg = *cur + 1;
   int len = strcspn(arg, "\"\0");
+  if (len > ARG_MAX) return ERR_CMD_OR_ARGS_TOO_BIG;
   if (arg[len] == '\0') return ERR_CMD_ARGS_BAD;
   arg[len] = '\0';
   *cur = arg + len;
@@ -95,6 +96,7 @@ int parse_arg(char **cur, cmd_buff_t *cmd) {
 
   char *arg = *cur;
   int len = strcspn(arg, " \0");
+  if (len > ARG_MAX) return ERR_CMD_OR_ARGS_TOO_BIG;
   if (arg[len] == '\0') {
     *cur = arg + len - 1;
   } else {
@@ -127,7 +129,8 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cmd) {
   }
 
   cmd->argv[cmd->argc] = NULL;
-
+  if (cmd->argc == 0) return WARN_NO_CMDS;
+  if (strlen(cmd->argv[0]) > EXE_MAX) return ERR_CMD_OR_ARGS_TOO_BIG;
   return OK;
 }
 

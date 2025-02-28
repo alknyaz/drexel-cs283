@@ -48,6 +48,28 @@ EOF
     [ "$stripped_output" = "$expected_output" ]
 }
 
+@test "Empty piped command fails" {
+    run "./dsh" <<EOF                
+ls | 
+EOF
+
+    # Strip all whitespace (spaces, tabs, newlines) from the output
+    stripped_output=$(echo "$output" | tr -d '\t\n\r\f\v')
+
+    # Expected output with all whitespace removed for easier matching
+    expected_output="dsh3> warning: no commands provideddsh3> cmd loop returned -1"
+
+    # These echo commands will help with debugging and will only print
+    #if the test fails
+    echo "Captured stdout:" 
+    echo "Output: $output"
+    echo "Exit Status: $status"
+    echo "${stripped_output} -> ${expected_output}"
+
+    # Check exact match
+    [ "$stripped_output" = "$expected_output" ]
+}
+
 @test "8 piped commands succeed" {
     run "./dsh" <<EOF                
 echo "hello world" | cat | cat | cat | cat | cat | cat | cat
